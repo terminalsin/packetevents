@@ -63,7 +63,6 @@ public class ServerConnectionInitializerModern {
         PacketEncoderModern encoder = new PacketEncoderModern(user);
         ChannelHandler vanillaEncoder = channel.pipeline().get(PacketEvents.ENCODER_NAME);
         encoder.wrappedEncoder = (MessageToByteEncoder<?>) vanillaEncoder;
-        //TODO Test new encoder stuff on multiple packetevents instances, and add same code to legacy initializer
         if (ViaVersionUtil.isAvailable()
                 && ViaVersionUtil.getBukkitEncodeHandlerClass().equals(vanillaEncoder.getClass())) {
             //Read the minecraft encoder stored in ViaVersion's encoder.
