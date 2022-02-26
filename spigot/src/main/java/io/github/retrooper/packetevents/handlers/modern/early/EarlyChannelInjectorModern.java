@@ -335,20 +335,7 @@ public class EarlyChannelInjectorModern implements EarlyInjector {
 
     private void addCustomViaDecoder(Object ch, PacketDecoderModern decoder) {
         Channel channel = (Channel) ch;
-        ChannelHandler viaDecoder = channel.pipeline().get("decoder");
-        ReflectionObject reflectionObject = new ReflectionObject(viaDecoder);
-        ByteToMessageDecoder mcDecoder = reflectionObject.readObject(0, ByteToMessageDecoder.class);
-        if (ClassUtil.getClassSimpleName(mcDecoder.getClass()).equals("PacketDecoderModern")) {
-            //We aren't the first decoder to inject into ViaVersion's decoder
-            ReflectionObject reflectPacketDecoderModern = new ReflectionObject(mcDecoder);
-            List<Object> decoders = reflectPacketDecoderModern.readList(0);
-            decoders.add(decoder);
-            reflectPacketDecoderModern.writeList(0, decoders);
-        } else {
-            //We are the first decoder to inject into ViaVersion's decoder
-            decoder.mcDecoder = mcDecoder;
-            reflectionObject.write(ByteToMessageDecoder.class, 0, decoder);
-        }
+        channel.pipeline().addAfter("via_decoder", PacketEvents.DECODER_NAME, decoder);
     }
 
     @Override

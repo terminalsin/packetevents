@@ -28,38 +28,28 @@ import com.github.retrooper.packetevents.util.EventCreationUtil;
 import com.github.retrooper.packetevents.util.ExceptionUtil;
 import io.github.retrooper.packetevents.handlers.compression.PacketCompressionUtil;
 import io.github.retrooper.packetevents.utils.SpigotReflectionUtil;
-import io.github.retrooper.packetevents.utils.dependencies.viaversion.CustomPipelineUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PacketDecoderModern extends ByteToMessageDecoder {
-    public ByteToMessageDecoder mcDecoder = null;
-    public List<ByteToMessageDecoder> decoders = new ArrayList<>();
     public User user;
     public volatile Player player;
     public boolean handledCompression;
     public boolean skipDoubleTransform;
-    private final List<Runnable> postTasks = new ArrayList<>();
 
     public PacketDecoderModern(User user) {
         this.user = user;
     }
 
     public PacketDecoderModern(PacketDecoderModern decoder) {
-        mcDecoder = decoder.mcDecoder;
-        decoders = decoder.decoders;
         user = decoder.user;
         player = decoder.player;
         handledCompression = decoder.handledCompression;
         skipDoubleTransform = decoder.skipDoubleTransform;
-        postTasks.clear();
-        postTasks.addAll(decoder.postTasks);
     }
 
     public void read(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) throws Exception {
@@ -104,33 +94,13 @@ public class PacketDecoderModern extends ByteToMessageDecoder {
     public void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
         if (buffer.readableBytes() != 0) {
             read(ctx, buffer, out);
-            for (ByteToMessageDecoder decoder : decoders) {
-                //Only support one output object
-                if (!out.isEmpty()) {
-                    Object input = out.get(0);
-                    out.clear();
-                    out.addAll(CustomPipelineUtil.callDecode(decoder, ctx, input));
-                }
-            }
-            if (mcDecoder != null) {
-                //Call minecraft decoder to convert the ByteBuf to an NMS object for the next handlers
-                try {
-                    if (!out.isEmpty()) {
-                        Object input = out.get(0);
-                        out.clear();
-                        out.addAll(CustomPipelineUtil.callDecode(mcDecoder, ctx, input));
-                    }
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         //if (!ExceptionUtil.isExceptionContainedIn(cause, PacketEvents.getAPI().getNettyManager().getChannelOperator().getIgnoredHandlerExceptions())) {
-            super.exceptionCaught(ctx, cause);
+        super.exceptionCaught(ctx, cause);
         //}
         //Check if the minecraft server will already print our exception for us.
         if (ExceptionUtil.isException(cause, PacketProcessException.class)

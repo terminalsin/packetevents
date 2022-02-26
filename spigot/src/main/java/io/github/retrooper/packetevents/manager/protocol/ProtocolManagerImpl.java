@@ -76,20 +76,7 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void sendPacket(Object channel, Object byteBuf) {
         if (ChannelHelper.isOpen(channel)) {
-            Object encoder = ChannelHelper.getPipelineHandler(channel, PacketEvents.ENCODER_NAME);
-            Object ctx = ChannelHelper.getPipelineContext(channel, PacketEvents.ENCODER_NAME);
-            Object inputBuffer = UnpooledByteBufAllocationHelper.buffer();
-            ByteBufHelper.writeBytes(inputBuffer, byteBuf);
-            ByteBufHelper.clear(byteBuf);
-            try {
-                CustomPipelineUtil.callEncode(encoder, ctx, inputBuffer, byteBuf);
-            } catch (InvocationTargetException e) {
-                // TODO: This is a hack until ProtocolLib + ViaVersion incompatibility is fixed
-                if (!ViaVersionUtil.isAvailable() || !ExceptionUtil.isException(e, InvocationTargetException.class)) {
-                    e.printStackTrace();
-                }
-            }
-            ChannelHelper.writeAndFlushInContext(channel, PacketEvents.ENCODER_NAME, byteBuf);
+            ChannelHelper.writeAndFlush(channel, byteBuf);
         }
     }
 
@@ -163,7 +150,6 @@ public class ProtocolManagerImpl implements ProtocolManager {
     @Override
     public void receivePacketSilently(Object channel, Object byteBuf) {
         //Receive the packet for all handlers after our decoder
-        //TODO Consider viaversion when we are in play state
         ChannelHelper.fireChannelReadInContext(channel, PacketEvents.DECODER_NAME, byteBuf);
     }
 
