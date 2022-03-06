@@ -1,5 +1,8 @@
 rootProject.name = 'packetevents'
 include ':api'
+include ':adventure'
+include ':netty-common'
 include ':spigot'
 include ':bungeecord'
-include 'netty-common'
+include 'velocity'
+

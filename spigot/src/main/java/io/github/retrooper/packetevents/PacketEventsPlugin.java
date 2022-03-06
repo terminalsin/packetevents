@@ -24,8 +24,6 @@ import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract;
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent;
 import com.github.retrooper.packetevents.event.simple.PacketPlaySendEvent;
 import com.github.retrooper.packetevents.netty.channel.ChannelHelper;
-import com.github.retrooper.packetevents.protocol.chat.ChatPosition;
-import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.particle.Particle;
 import com.github.retrooper.packetevents.protocol.particle.type.ParticleTypes;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
@@ -36,9 +34,7 @@ import com.github.retrooper.packetevents.util.Vector3d;
 import com.github.retrooper.packetevents.util.Vector3f;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.*;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChatMessage;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerParticle;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowConfirmation;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import io.github.retrooper.packetevents.utils.SpigotDataHelper;
 import net.kyori.adventure.text.Component;
@@ -108,10 +104,6 @@ public class PacketEventsPlugin extends JavaPlugin {
                                 .color(NamedTextColor.RED)
                                 .append(Component.text(" Data: " + brandData)
                                         .color(NamedTextColor.GOLD));
-                        WrapperPlayServerChatMessage cm = new WrapperPlayServerChatMessage(component, ChatPosition.CHAT);
-                        user.writePacket(cm);
-                        WrapperPlayServerWindowConfirmation transaction = new WrapperPlayServerWindowConfirmation(0, (short) 10000, false);
-                        user.writePacket(transaction);
                         break;
                     default:
                         break;
@@ -121,14 +113,14 @@ public class PacketEventsPlugin extends JavaPlugin {
             @Override
             public void onPacketPlaySend(PacketPlaySendEvent event) {
                 Player player = (Player) event.getPlayer();
-                if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
+                /*if (event.getPacketType() == PacketType.Play.Server.JOIN_GAME) {
                     if (player != null) {
                         player.sendMessage("Hii " + player.getName());
                         event.getUser().sendMessage(ChatColor.GREEN + "Hi pt TWOOO");
                     } else {
                         event.getUser().sendMessage(ChatColor.RED + "player null, but hi dude!!!");
                     }
-                }
+                }*/
                 /*else if (event.getPacketType() == PacketType.Play.Server.CHAT_MESSAGE) {
                     WrapperPlayServerChatMessage chatMessage = new WrapperPlayServerChatMessage(event);
                     event.setCancelled(true);

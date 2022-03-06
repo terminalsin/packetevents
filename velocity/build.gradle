@@ -8,35 +8,42 @@ group = 'com.github.retrooper'
 version = '2.0.0'
 
 repositories {
+    mavenLocal()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public/' }
+    maven {
+        url 'https://repo.velocitypowered.com/snapshots/'
+    }
 }
 
 shadowJar {
     //Just for jitpack to work
     archiveVersion.set('')
-
     minimize()
 }
 
 dependencies {
     compileOnly 'org.jetbrains:annotations:22.0.0'
-    compileOnly 'net.kyori:adventure-api:4.10.0'
-    compileOnly 'net.kyori:adventure-text-serializer-gson:4.10.0'
-    compileOnly 'net.kyori:adventure-text-serializer-legacy:4.10.0'
+    compileOnly 'com.velocitypowered:velocity-api:1.0.0-SNAPSHOT'
+    api project(':api')
+    implementation project(':netty-common')
+    implementation project(':adventure')
 }
 
 publishing {
     publications {
         maven(MavenPublication) {
             groupId = 'com.github.retrooper.packetevents'
-            artifactId = 'api'
+            artifactId = 'velocity'
             from(components.java)
         }
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+//So that SNAPSHOT is always the latest SNAPSHOT
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
 }
 
 //So we only produce one jar with shadowJar. No suffixes. Just replace what the original jar would be named.

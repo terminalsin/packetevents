@@ -28,12 +28,22 @@ import com.github.retrooper.packetevents.util.PacketTransformationUtil;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface ProtocolManager {
     Map<String, Object> CHANNELS = new ConcurrentHashMap<>();
     Map<Object, User> USERS = new ConcurrentHashMap<>();
+
+    default Collection<User> getUsers() {
+        return USERS.values();
+    }
+
+    default Collection<Object> getChannels() {
+        return CHANNELS.values();
+    }
 
     //Methods to implement
     ProtocolVersion getPlatformVersion();
@@ -195,13 +205,5 @@ public interface ProtocolManager {
 
     default Object getChannel(String username) {
         return CHANNELS.get(username);
-    }
-
-    default void clearUserData(Object channel, @Nullable String name) {
-        USERS.remove(channel);
-        //Name is only accessible if the server sends the LOGIN_SUCCESS packet which contains name and UUID
-        if (name != null) {
-            CHANNELS.remove(name);
-        }
     }
 }
