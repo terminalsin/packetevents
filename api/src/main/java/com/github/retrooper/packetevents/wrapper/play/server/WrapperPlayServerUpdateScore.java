@@ -66,7 +66,11 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
         }
         else {
             entityName = readString(40);
-            action = Action.VALUES[readByte()];
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                action = Action.values()[readVarInt()];
+            } else {
+                action = Action.VALUES[readByte()];
+            }
             objectiveName = readString(16);
             if (action != Action.REMOVE_ITEM) {
                 value = Optional.of(readVarInt());
@@ -98,7 +102,11 @@ public class WrapperPlayServerUpdateScore extends PacketWrapper<WrapperPlayServe
         }
         else {
             writeString(entityName, 40);
-            writeByte(action.ordinal());
+            if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+                writeVarInt(action.ordinal());
+            } else {
+                writeByte(action.ordinal());
+            }
             writeString(objectiveName, 16);
             if (action != Action.REMOVE_ITEM) {
                 writeVarInt(value.orElse(-1));

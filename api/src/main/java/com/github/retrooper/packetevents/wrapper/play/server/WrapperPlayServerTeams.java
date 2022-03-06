@@ -148,7 +148,11 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
 
     @Override
     public void readData() {
-        teamName = readString();
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            teamName = readString(16);
+        } else {
+            teamName = readString();
+        }
         teamMode = TeamMode.values()[readByte()];
         ScoreBoardTeamInfo info = null;
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
@@ -206,7 +210,11 @@ public class WrapperPlayServerTeams extends PacketWrapper<WrapperPlayServerTeams
 
     @Override
     public void writeData() {
-        writeString(teamName);
+        if (serverVersion.isNewerThanOrEquals(ServerVersion.V_1_13)) {
+            writeString(teamName, 16);
+        } else {
+            writeString(teamName);
+        }
         writeByte(teamMode.ordinal());
         if (teamMode == TeamMode.CREATE || teamMode == TeamMode.UPDATE) {
             ScoreBoardTeamInfo info = teamInfo.orElse(new ScoreBoardTeamInfo(Component.empty(), Component.empty(), Component.empty(),
